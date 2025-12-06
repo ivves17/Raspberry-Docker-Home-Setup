@@ -1,0 +1,96 @@
+# This config is intented to make unbound work as a recurisve DNS server, if you want to upstream to other dns like Quad9 or Google, I recommend that you use the pihole config to do so instead of unbound
+server:
+    cache-min-ttl: 300
+    directory: "/opt/unbound/etc/unbound"
+    do-ip4: yes
+    # Leave ip6 as yes if you use it
+    do-ip6: no
+    do-tcp: yes
+    do-udp: yes
+    edns-buffer-size: 1232
+    # Port used by the interface, leaving it as 53 will work anyway as we are not exposing any port with docker, evading conflicts with pihole
+    interface: 0.0.0.0@53
+    prefer-ip6: no
+    rrset-roundrobin: yes
+    username: "_unbound"
+    log-local-actions: no
+    log-queries: no
+    log-replies: no
+    log-servfail: no
+    logfile: /dev/null
+
+    # Set logging level
+    # Level 0: No verbosity, only errors.
+    # Level 1: Gives operational information.
+    # Level 2: Gives detailed operational information including short information per query.
+    # Level 3: Gives query level information, output per query.
+    # Level 4: Gives algorithm level information.
+    # Level 5: Logs client identification for cache misses.
+    verbosity: 0
+
+    infra-cache-slabs: 4
+    incoming-num-tcp: 10
+    key-cache-slabs: 4
+    msg-cache-size: 142768128
+    msg-cache-slabs: 4
+    num-queries-per-thread: 4096
+    num-threads: 1
+    outgoing-range: 8192
+    rrset-cache-size: 285536256
+    rrset-cache-slabs: 4
+    minimal-responses: yes
+    prefetch: yes
+    prefetch-key: yes
+    serve-expired: yes
+    so-reuseport: yes
+    so-rcvbuf: 425984
+    aggressive-nsec: yes
+    delay-close: 10000
+    do-daemonize: no
+    do-not-query-localhost: no
+    neg-cache-size: 4M
+    qname-minimisation: yes
+
+    access-control: 127.0.0.1/32 allow
+    access-control: 192.168.0.0/16 allow
+    access-control: 172.16.0.0/12 allow
+    access-control: 10.0.0.0/8 allow
+    access-control: fc00::/7 allow
+    access-control: ::1/128 allow
+    # You can add more network IPs depending on your own case:
+    access-control: X.X.X.X/24 allow
+
+    auto-trust-anchor-file: "/var/root.key"
+    chroot: "/opt/unbound/etc/unbound"
+    deny-any: yes
+    harden-algo-downgrade: yes
+    harden-below-nxdomain: yes
+    harden-dnssec-stripped: yes
+    harden-glue: yes
+    harden-large-queries: yes
+    harden-referral-path: no
+    harden-short-bufsize: yes
+    hide-http-user-agent: no
+    hide-identity: yes
+    hide-version: yes
+    http-user-agent: "DNS"
+    identity: "DNS"
+
+    private-address: 10.0.0.0/8
+    private-address: 172.16.0.0/12
+    private-address: 192.168.0.0/16
+    private-address: 169.254.0.0/16
+    private-address: fd00::/8
+    private-address: fe80::/10
+    private-address: ::ffff:0:0/96
+    # When adding your own domain, place it this way:
+    private-domain: yourdomain.com
+
+    ratelimit: 1000
+    tls-cert-bundle: /etc/ssl/certs/ca-certificates.crt
+    unwanted-reply-threshold: 10000
+    use-caps-for-id: yes
+    val-clean-additional: yes
+
+remote-control:
+    control-enable: no

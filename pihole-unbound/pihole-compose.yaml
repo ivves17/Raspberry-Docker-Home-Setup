@@ -1,0 +1,58 @@
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      # Ports used in my case: (Use an http port ex. 80 if you don't plan on using https)
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8443:443/tcp"
+      # Uncomment the line below if you are using Pi-hole as your DHCP server
+      #- "67:67/udp"
+      # Uncomment the line below if you are using Pi-hole as your NTP server
+      #- "123:123/udp"
+    environment:
+      TZ: 'Europe/Madrid' # Configure your timezone here
+      FTLCONF_webserver_api_password: ${PIPASS} # Create an .env file in the same directory as the .yaml to assign a password, or just delete the variable and type it here
+      FTLCONF_dns_listeningMode: 'all'
+      # Comment the next line if you want to change your dns upstreams from the web UI
+      FTLCONF_dns_upstreams: 'unbound'
+    # Volumes store your data between container upgrades
+    volumes:
+      # For persisting Pi-hole's databases and common configuration file
+      - './pihole-unbound/etc-pihole:/etc/pihole'
+      # Uncomment the below if you have custom dnsmasq config files that you want to persist.
+      - './pihole-unbound/etc-dnsmasq.d:/etc/dnsmasq.d'
+    cap_add:
+      # See https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+      # Required if you are using Pi-hole as your DHCP server, else not needed
+      - NET_ADMIN
+      # Required if you are using Pi-hole as your NTP client to be able to set the host's system time
+      #- SYS_TIME
+      # Optional, if Pi-hole should get some more processing time
+      - SYS_NICE
+    networks:
+      marinero:
+        ipv4_address: 172.18.0.3
+    restart: unless-stopped
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound-rpi:latest
+    # This volume is pretty important, as you'll store the unbound.conf file in this route
+    volumes:
+      - './unbound:/opt/unbound/etc/unbound'
+    networks:
+      marinero:
+        ipv4_address: 172.18.0.6
+    restart: unless-stopped
+
+# You can use any network config you want here but in my case I use an external bridge network and an static IP
+networks:
+  marinero:
+    external: true # This is necessary if you have your own docker netowrk created and don't want docker to create a new one
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1

@@ -1,0 +1,42 @@
+# --- GLOBAL ---
+.DS_Store
+.env
+*.log
+*.pid
+
+# --- CREDENTIALS ---
+*.key
+*.pem
+*.pub
+*.crt
+id_rsa
+rsa_key*
+cli_pw
+
+# --- DATABASES ---
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Nginx Proxy Manager
+**/npm/data/
+**/npm/letsencrypt/
+
+# Portainer
+**/portainer/portainer_data/
+
+# Vaultwarden
+**/vaultwarden/vw-data/
+
+# Pi-hole/Unbound
+**/pihole-unbound/etc-pihole/
+**/pihole-unbound/etc-dnsmasq.d/
+**/pihole-unbound/unbound/var/
+**/pihole-unbound/unbound/dev/
+**/pihole-unbound/unbound/unbound.conf
+**/adlists.list
+**/custom.list
+**/dnsmasq.conf
+**/pihole.toml

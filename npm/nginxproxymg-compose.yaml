@@ -1,0 +1,37 @@
+services:
+  app:
+    container_name: nginx-proxymgr
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+
+    ports:
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+
+    environment:
+      TZ: "Europe/Madrid"
+      # Uncomment this if you want to change the location of
+      # the SQLite DB file within the container
+      # DB_SQLITE_FILE: "/data/database.sqlite"
+
+      #Comment this if IPv6 is enabled on your host
+      DISABLE_IPV6: 'true'
+
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+# You can use any network config you want here but in my case I use an external bridge network and an static IP
+    networks:
+      marinero:
+        ipv4_address: 172.18.0.2
+
+networks:
+  marinero:
+    external: true # This is necessary if you have your own docker netowrk created and don't want docker to create a new one
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
